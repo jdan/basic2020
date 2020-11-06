@@ -1,15 +1,17 @@
 start = Program
 
-Program = _ statements:Statement* _
+Program = _ body:Statement* _
   {
     return {
       type: "Program",
-      body: statements,
+      body,
     }
   }
 
 Statement
-  = expression:Expression
+  = IfStatement
+  / VariableDeclaration
+  / expression:Expression
     {
       return {
         type: "ExpressionStatement",
@@ -17,20 +19,54 @@ Statement
       }
     }
 
-Expression =
-  Assignment / FunctionCall / BinaryExpression / Value
+IfStatement
+  = "if"i _ test:Expression _ consequent:BlockStatement _ "else"i _ alternate:BlockStatement _ "end"i
+    {
+      return {
+        type: "IfStatement",
+        test,
+        consequent,
+        alternate,
+      }
+    }
+  / "if"i _ test:Expression _ consequent:BlockStatement _ "end"i  // can we combine these?
+    {
+      return {
+        type: "IfStatement",
+        test,
+        consequent,
+        alternate: null,
+      }
+    }
 
-Assignment = left:(Binding) _ "<-" _ right:Expression _
+BlockStatement = _ body:Statement* _
   {
     return {
-      type: "AssignmentExpression",
-      left,
-      right,
+      type: "BlockStatement",
+      body,
     }
   }
 
+VariableDeclaration = id:(Binding) _ "<-" _ init:Expression _
+  {
+    return {
+      type: "VariableDeclaration",
+      kind: "let",
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          id,
+          init,
+        }
+      ]
+    }
+  }
+
+Expression = FunctionCall / BinaryExpression / Value
+
 Value
   = Number
+  / Boolean
   / Binding
   / '(' _ expr:Expression _ ')' { return expr }
 
@@ -49,15 +85,18 @@ FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
     return {
       type: "CallExpression",
       callee,
-      argument,
+      arguments: [argument],
     }
   }
 
 Number = digits:[0-9]+
   {
+    let inp = digits.join("");
+
     return {
       type: "Literal",
-      raw: digits.join(""),
+      raw: inp,
+      value: parseInt(inp),
     }
   }
 Operator = operator:[\*\+]
@@ -68,6 +107,9 @@ Binding = name:([A-Za-z][A-Za-z0-9\$_]*)
       name: name.flat().join(""),
     }
   }
+Boolean
+  = "true"i { return { type: "Literal", raw: "true", value: true } }
+  / "false"i { return { type: "Literal", raw: "false", value: false } }
 
 /**********
  Match any sequence of "whitespace" characters
