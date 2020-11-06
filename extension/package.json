@@ -1,0 +1,30 @@
+{
+    "name": "basic2020",
+    "publisher": "jdan",
+    "displayName": "BASIC2020",
+    "description": "",
+    "version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jdan/basic2020"
+    },
+    "engines": {
+        "vscode": "^1.51.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "basic2020",
+            "aliases": ["BASIC2020", "basic2020"],
+            "extensions": [".bas2020"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "basic2020",
+            "scopeName": "source.basic2020",
+            "path": "./syntaxes/basic2020.tmLanguage.json"
+        }]
+    }
+}

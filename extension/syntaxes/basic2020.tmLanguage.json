@@ -1,0 +1,78 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "BASIC2020",
+	"patterns": [
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#storage"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#constants"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.basic2020",
+					"match": "(?i)\\b(if|else|end|return)\\b"
+				},
+				{
+					"name": "keyword.operator.basic2020",
+					"match": "\\+|\\-|\\*|\\/|=|<=?|>=?"
+				}
+			]
+		},
+		"constants": {
+			"patterns": [
+				{
+					"name": "constant.numeric.basic2020",
+					"match": "\\b[0-9]+\\b"
+				},
+				{
+					"name": "constant.language.boolean.basic2020",
+					"match": "(?i)\\btrue|false\\b"
+				}
+			]
+		},
+		"storage": {
+			"patterns": [
+				{
+					"name": "storage.type.function.basic2020",
+					"match": "(?i)\\bfunction\\b"
+				},
+				{
+					"match": "\\b([A-Za-z][A-Za-z0-9\\$_]*)\\s*(<-)",
+					"captures": {
+						"0": {
+							"name": "variable.basic2020"
+						},
+						"1": {
+							"name": "keyword.operator.assignment.basic2020"
+						}
+					}
+				}
+			]
+		},
+		"strings": {
+			"patterns": [
+				{
+					"name": "string.quoted.single.basic2020",
+					"begin": "'",
+					"end": "'"
+				},
+				{
+					"name": "string.quoted.double.basic2020",
+					"begin": "\"",
+					"end": "\""
+				}
+			]
+		}
+	},
+	"scopeName": "source.basic2020"
+}
