@@ -10,6 +10,7 @@ Program = _ body:Statement* _
 
 Statement
   = IfStatement
+  / FunctionDeclaration
   / VariableDeclaration
   / expression:Expression
     {
@@ -20,7 +21,7 @@ Statement
     }
 
 IfStatement
-  = "if"i _ test:Expression _ consequent:BlockStatement _ "else"i _ alternate:BlockStatement _ "end"i
+  = "if"i _ test:Expression _ consequent:BlockStatement _ "else"i _ alternate:BlockStatement _ "end"i _
     {
       return {
         type: "IfStatement",
@@ -47,7 +48,18 @@ BlockStatement = _ body:Statement* _
     }
   }
 
-VariableDeclaration = id:(Binding) _ "<-" _ init:Expression _
+FunctionDeclaration
+  = "function"i _ id:Identifier _ "(" _ param:Identifier _ ")" _ body:BlockStatement _ "end"i _
+  {
+    return {
+      type: "FunctionDeclaration",
+      id,
+      params: [ param ],
+      body,
+    }
+  }
+
+VariableDeclaration = id:Identifier _ "<-" _ init:Expression _
   {
     return {
       type: "VariableDeclaration",
@@ -62,14 +74,35 @@ VariableDeclaration = id:(Binding) _ "<-" _ init:Expression _
     }
   }
 
-Expression = FunctionCall / BinaryExpression / Value
+Expression = FunctionExpression / FunctionCall / BinaryExpression / Value
 
 Value
   = Number
   / String
   / Boolean
-  / Binding
+  / Identifier
   / '(' _ expr:Expression _ ')' { return expr }
+
+// hmmmmmm putting `_` at the end of this breaks everything
+FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
+  {
+    return {
+      type: "CallExpression",
+      callee,
+      arguments: [argument],
+    }
+  }
+
+FunctionExpression
+  = "function"i _ id:Identifier? _ "(" _ param:Identifier _ ")" _ body:BlockStatement _ "end"i _
+    {
+      return {
+        type: "FunctionExpression",
+        id,
+        params: [param],
+        body,
+      }
+    }
 
 BinaryExpression = left:Value _ operator:Operator _ right:Expression
   {
@@ -78,15 +111,6 @@ BinaryExpression = left:Value _ operator:Operator _ right:Expression
       left,
       operator,
       right,
-    }
-  }
-
-FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
-  {
-    return {
-      type: "CallExpression",
-      callee,
-      arguments: [argument],
     }
   }
 
@@ -118,7 +142,7 @@ String
       }
     }
 Operator = operator:[\*\+]
-Binding = name:([A-Za-z][A-Za-z0-9\$_]*)
+Identifier = name:([A-Za-z][A-Za-z0-9\$_]*)
   {
     return {
       type: "Identifier",

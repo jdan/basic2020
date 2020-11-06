@@ -6,12 +6,13 @@ let transform = require("./transform");
 let parser = pegjs.generate(fs.readFileSync("./basic2020.pegjs", "utf-8"));
 
 let program = `
-  k <- TRUE
-  IF k
-    IF FALSE PRINT("I'll look into it") END
-  ELSE
-    PRINT('"Oh no"')
+  FUNCTION hello(t)
+    PRINT(1)
   END
+
+  setTimeout(FUNCTION(t)
+    PRINT(2)
+  END)
 `;
 
 let parsed = parser.parse(program);
