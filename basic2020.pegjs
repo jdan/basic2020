@@ -1,10 +1,12 @@
 start = Program
 
-Program = _ body:Statement* _
+Program = _ head:Statement rest:(SEP Statement)* _
   {
     return {
       type: "Program",
-      body,
+      body: [
+        head, ...rest.map(pair => pair[1]),
+      ]
     }
   }
 
@@ -22,7 +24,7 @@ Statement
     }
 
 IfStatement
-  = "if"i _ test:Expression _ consequent:BlockStatement _ "else"i _ alternate:BlockStatement _ "end"i
+  = "if"i SEP test:Expression SEP consequent:BlockStatement SEP "else"i SEP alternate:BlockStatement SEP "end"i
     {
       return {
         type: "IfStatement",
@@ -31,7 +33,7 @@ IfStatement
         alternate,
       }
     }
-  / "if"i _ test:Expression _ consequent:BlockStatement _ "end"i // can we combine these?
+  / "if"i SEP test:Expression SEP consequent:BlockStatement SEP "end"i // can we combine these?
     {
       return {
         type: "IfStatement",
@@ -41,16 +43,23 @@ IfStatement
       }
     }
 
-BlockStatement = _ body:Statement* _
+BlockStatement = head:Statement rest:(SEP Statement)*
   {
+    // console.log([
+    //     head,
+    //     ...rest.map(pair => pair[1])
+    //   ])
     return {
       type: "BlockStatement",
-      body,
+      body: [
+        head,
+        ...rest.map(pair => pair[1])
+      ],
     }
   }
 
 FunctionDeclaration
-  = "function"i _ id:Identifier _ "(" _ param:Identifier _ ")" _ body:BlockStatement _ "end"i _
+  = "function"i _ id:Identifier _ "(" _ param:Identifier _ ")" _ body:BlockStatement _ "end"i
   {
     return {
       type: "FunctionDeclaration",
@@ -60,7 +69,7 @@ FunctionDeclaration
     }
   }
 
-VariableDeclaration = id:Identifier _ "<-" _ init:Expression _
+VariableDeclaration = id:Identifier _ "<-" _ init:Expression
   {
     return {
       type: "VariableDeclaration",
@@ -103,7 +112,7 @@ FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
   }
 
 FunctionExpression
-  = "function"i _ id:Identifier? _ "(" _ param:Identifier _ ")" _ body:BlockStatement _ "end"i _
+  = "function"i SEP id:Identifier? _ "(" _ param:Identifier _ ")" _ body:BlockStatement _ "end"i
     {
       return {
         type: "FunctionExpression",
@@ -163,7 +172,7 @@ String
       }
     }
 Operator = "+" / "-" / "*" / '/' / "!=" / "=" / "<=" / ">=" / "<" / ">"
-Identifier = name:([A-Za-z][A-Za-z0-9\$_]*)
+Identifier = !ReservedWord name:([A-Za-z][A-Za-z0-9\$_]*)
   {
     return {
       type: "Identifier",
@@ -174,7 +183,11 @@ Boolean
   = "true"i { return { type: "Literal", raw: "true", value: true } }
   / "false"i { return { type: "Literal", raw: "false", value: false } }
 
-/**********
- Match any sequence of "whitespace" characters
-**********/
+// TODO: Make tokens of these to use everywhere
+ReservedWord = "if"i / "else"i / "end"i / "function"i
+
+// Optional whitespace
 _ = [ \t\n\r]*
+
+// Mandatory whitespace
+SEP = [ \t\n\r]+
