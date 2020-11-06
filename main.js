@@ -6,16 +6,19 @@ let transform = require("./transform");
 let parser = pegjs.generate(fs.readFileSync("./basic2020.pegjs", "utf-8"));
 
 let program = `
-  FUNCTION hello(t)
-    PRINT(1)
+  FUNCTION factorial(N)
+    IF N <= 1
+      RETURN 1
+    ELSE
+      RETURN N * factorial(N - 1)
+    END
   END
 
-  setTimeout(FUNCTION(t)
-    PRINT(2)
-  END)
+  PRINT(factorial(20))
 `;
 
 let parsed = parser.parse(program);
 let transformed = transform(parsed);
 let generated = escodegen.generate(transformed);
 console.log(generated);
+eval(generated);

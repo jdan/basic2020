@@ -12,6 +12,7 @@ Statement
   = IfStatement
   / FunctionDeclaration
   / VariableDeclaration
+  / ReturnStatement
   / expression:Expression
     {
       return {
@@ -21,7 +22,7 @@ Statement
     }
 
 IfStatement
-  = "if"i _ test:Expression _ consequent:BlockStatement _ "else"i _ alternate:BlockStatement _ "end"i _
+  = "if"i _ test:Expression _ consequent:BlockStatement _ "else"i _ alternate:BlockStatement _ "end"i
     {
       return {
         type: "IfStatement",
@@ -30,7 +31,7 @@ IfStatement
         alternate,
       }
     }
-  / "if"i _ test:Expression _ consequent:BlockStatement _ "end"i  // can we combine these?
+  / "if"i _ test:Expression _ consequent:BlockStatement _ "end"i // can we combine these?
     {
       return {
         type: "IfStatement",
@@ -71,6 +72,14 @@ VariableDeclaration = id:Identifier _ "<-" _ init:Expression _
           init,
         }
       ]
+    }
+  }
+
+ReturnStatement = "return"i _ argument:Expression
+  {
+    return {
+      type: "ReturnStatement",
+      argument,
     }
   }
 
@@ -141,7 +150,7 @@ String
         raw: `'${value.join("")}'`,
       }
     }
-Operator = operator:[\*\+]
+Operator = "+" / "-" / "*" / '/' / "=" / "<=" / ">=" / "<" / ">"
 Identifier = name:([A-Za-z][A-Za-z0-9\$_]*)
   {
     return {
