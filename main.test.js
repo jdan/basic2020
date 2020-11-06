@@ -116,3 +116,19 @@ test("supports higher order functions and function expressions", () => {
     `)
   ).toEqual(25);
 });
+
+test("supports recursive functions", () => {
+  expect(
+    run(`
+      FUNCTION FACTORIAL(N)
+        IF N = 1
+          RETURN 1
+        ELSE
+          RETURN N * FACTORIAL(N-1)
+        END
+      END
+
+      FACTORIAL(10)
+    `)
+  ).toEqual(3628800);
+});

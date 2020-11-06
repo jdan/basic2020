@@ -83,7 +83,7 @@ ReturnStatement = "return"i _ argument:Expression
     }
   }
 
-Expression = FunctionExpression / FunctionCall / BinaryExpression / Value
+Expression = BinaryExpression / UnaryExpression
 
 Value
   = Number
@@ -113,7 +113,9 @@ FunctionExpression
       }
     }
 
-BinaryExpression = head:Value rest:(_ Operator _ Value)+
+UnaryExpression = FunctionExpression / FunctionCall / Value
+
+BinaryExpression = head:UnaryExpression rest:(_ Operator _ UnaryExpression)+
   {
     // Left-recursion: I assume we'll need this for lists of
     // statements and arguments
