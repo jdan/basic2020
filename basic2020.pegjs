@@ -1,13 +1,19 @@
 start = Program
 
-Program = _ head:Statement rest:(SEP Statement)* _
+Program = _ body:StatementList _
   {
     return {
       type: "Program",
-      body: [
-        head, ...rest.map(pair => pair[1]),
-      ]
+      body,
     }
+  }
+
+StatementList = head:Statement rest:(SEP Statement)*
+  {
+    return [
+      head,
+      ...rest.map(([space, statement]) => statement),
+    ]
   }
 
 Statement
@@ -24,8 +30,12 @@ Statement
     }
 
 IfStatement
-  = "if"i SEP test:Expression SEP consequent:BlockStatement SEP "else"i SEP alternate:BlockStatement SEP "end"i
+  = "if"i SEP test:Expression SEP
+      consequent:BlockStatement SEP
+      alternateBlock:("else"i SEP alternate:BlockStatement SEP)?
+      "end"i
     {
+      let alternate = alternateBlock ? alternateBlock[2] : null
       return {
         type: "IfStatement",
         test,
@@ -33,33 +43,17 @@ IfStatement
         alternate,
       }
     }
-  / "if"i SEP test:Expression SEP consequent:BlockStatement SEP "end"i // can we combine these?
-    {
-      return {
-        type: "IfStatement",
-        test,
-        consequent,
-        alternate: null,
-      }
-    }
 
-BlockStatement = head:Statement rest:(SEP Statement)*
+BlockStatement = body:StatementList
   {
-    // console.log([
-    //     head,
-    //     ...rest.map(pair => pair[1])
-    //   ])
     return {
       type: "BlockStatement",
-      body: [
-        head,
-        ...rest.map(pair => pair[1])
-      ],
+      body,
     }
   }
 
 FunctionDeclaration
-  = "function"i _ id:Identifier _ "(" _ param:Identifier _ ")" _ body:BlockStatement _ "end"i
+  = "function"i SEP id:Identifier _ "(" _ param:Identifier _ ")" _ body:BlockStatement SEP "end"i
   {
     return {
       type: "FunctionDeclaration",
@@ -84,7 +78,7 @@ VariableDeclaration = id:Identifier _ "<-" _ init:Expression
     }
   }
 
-ReturnStatement = "return"i _ argument:Expression
+ReturnStatement = "return"i SEP argument:Expression
   {
     return {
       type: "ReturnStatement",
@@ -112,7 +106,7 @@ FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
   }
 
 FunctionExpression
-  = "function"i SEP id:Identifier? _ "(" _ param:Identifier _ ")" _ body:BlockStatement _ "end"i
+  = "function"i SEP id:Identifier? _ "(" _ param:Identifier _ ")" _ body:BlockStatement SEP "end"i
     {
       return {
         type: "FunctionExpression",
@@ -126,8 +120,8 @@ UnaryExpression = FunctionExpression / FunctionCall / Value
 
 BinaryExpression = head:UnaryExpression rest:(_ Operator _ UnaryExpression)+
   {
-    // Left-recursion: I assume we'll need this for lists of
-    // statements and arguments
+    // Binary expressions are left-recursive
+    // i.e. 3-1-2 == (3-1)-2
     return rest.reduce(
       (left, item) => {
         let operator = item[1];
