@@ -132,3 +132,19 @@ test("supports recursive functions", () => {
     `)
   ).toEqual(3628800);
 });
+
+test("tokens are case-insensitive", () => {
+  expect(
+    run(`
+      function factorial(n)
+        if n = 1
+          return 1
+        else
+          return n * factorial(n-1)
+        end
+      end
+
+      factorial(10)
+    `)
+  ).toEqual(3628800);
+});
