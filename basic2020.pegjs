@@ -113,14 +113,24 @@ FunctionExpression
       }
     }
 
-BinaryExpression = left:Value _ operator:Operator _ right:Expression
+BinaryExpression = head:Value rest:(_ Operator _ Value)+
   {
-    return {
-      type: "BinaryExpression",
-      left,
-      operator,
-      right,
-    }
+    // Left-recursion: I assume we'll need this for lists of
+    // statements and arguments
+    return rest.reduce(
+      (left, item) => {
+        let operator = item[1];
+        let right = item[3];
+
+        return {
+          type: "BinaryExpression",
+          left,
+          operator,
+          right,
+        };
+      },
+      head
+    );
   }
 
 Number = digits:[0-9]+
@@ -150,7 +160,7 @@ String
         raw: `'${value.join("")}'`,
       }
     }
-Operator = "+" / "-" / "*" / '/' / "=" / "<=" / ">=" / "<" / ">"
+Operator = "+" / "-" / "*" / '/' / "!=" / "=" / "<=" / ">=" / "<" / ">"
 Identifier = name:([A-Za-z][A-Za-z0-9\$_]*)
   {
     return {

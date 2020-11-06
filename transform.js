@@ -19,7 +19,28 @@ let transformIfs = (node) =>
       }
     : node;
 
-let transforms = [transformIfs];
+let transformEqualOperator = (node) =>
+  node && node.type === "BinaryExpression" && node.operator === "="
+    ? {
+        ...node,
+        operator: "===",
+      }
+    : node;
+
+let transformNotEqualOperator = (node) =>
+  node && node.type === "BinaryExpression" && node.operator === "!="
+    ? {
+        ...node,
+        operator: "!==",
+      }
+    : node;
+
+let transforms = [
+  transformIfs,
+  transformEqualOperator,
+  transformNotEqualOperator,
+];
+
 let applyTransforms = (item) => transforms.reduce((acc, f) => f(acc), item);
 
 module.exports = function transform(ast) {
