@@ -27,3 +27,92 @@ test("evaluates strings", () => {
   expect(run(`"I'll be quoted this way"`)).toEqual("I'll be quoted this way");
   expect(run(`'"Run," she yelled'`)).toEqual('"Run," she yelled');
 });
+
+test("evaluates assignments", () => {
+  expect(
+    run(`
+      X <- 5
+      X
+    `)
+  ).toEqual(5);
+  expect(
+    run(`
+      X <- 5
+      Y <- 3
+      X
+    `)
+  ).toEqual(5);
+  expect(
+    run(`
+      X <- 5 * 10
+      X
+    `)
+  ).toEqual(50);
+});
+
+test("supports reassignments", () => {
+  expect(
+    run(`
+      X <- 5
+      X <- 10
+      X
+    `)
+  ).toEqual(10);
+});
+
+test("supports if statements", () => {
+  expect(
+    run(`
+      IF TRUE
+        10
+      ELSE
+        20
+      END
+    `)
+  ).toEqual(10);
+});
+
+test("supports ifs without elses", () => {
+  expect(
+    run(`
+      IF TRUE
+        10
+      END
+    `)
+  ).toEqual(10);
+
+  expect(
+    run(`
+      IF FALSE
+        10
+      END
+    `)
+  ).toEqual(undefined);
+});
+
+test("supports functions", () => {
+  expect(
+    run(`
+      FUNCTION ADDTWO(N)
+        RETURN N + 2
+      END
+
+      ADDTWO(20)
+    `)
+  ).toEqual(22);
+});
+
+test("supports higher order functions and function expressions", () => {
+  expect(
+    run(`
+      FUNCTION MAKEADDER(N)
+        RETURN (FUNCTION ADD(M)
+          RETURN N + M
+        END)
+      END
+
+      add_five <- MAKEADDER(5)
+      add_five(20)
+    `)
+  ).toEqual(25);
+});

@@ -64,7 +64,7 @@ VariableDeclaration = id:Identifier _ "<-" _ init:Expression _
   {
     return {
       type: "VariableDeclaration",
-      kind: "let",
+      kind: "var",
       declarations: [
         {
           type: "VariableDeclarator",
