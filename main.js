@@ -8,9 +8,9 @@ let parser = pegjs.generate(fs.readFileSync("./basic2020.pegjs", "utf-8"));
 let program = `
   k <- TRUE
   IF k
-    IF FALSE PRINT(3) END
+    IF FALSE PRINT("I'll look into it") END
   ELSE
-    PRINT(2)
+    PRINT('"Oh no"')
   END
 `;
 

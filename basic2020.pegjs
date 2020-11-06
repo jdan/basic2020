@@ -66,6 +66,7 @@ Expression = FunctionCall / BinaryExpression / Value
 
 Value
   = Number
+  / String
   / Boolean
   / Binding
   / '(' _ expr:Expression _ ')' { return expr }
@@ -99,6 +100,23 @@ Number = digits:[0-9]+
       value: parseInt(inp),
     }
   }
+String
+  = '"' value:[^"]* '"'
+    {
+      return {
+        type: "Literal",
+        value: value.join(""),
+        raw: `"${value.join("")}"`,
+      }
+    }
+  / "'" value:[^']* "'"
+    {
+      return {
+        type: "Literal",
+        value: value.join(""),
+        raw: `'${value.join("")}'`,
+      }
+    }
 Operator = operator:[\*\+]
 Binding = name:([A-Za-z][A-Za-z0-9\$_]*)
   {
