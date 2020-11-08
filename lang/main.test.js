@@ -133,6 +133,35 @@ test("supports recursive functions", () => {
   ).toEqual(3628800);
 });
 
+test("supports functions with any number of arguments", () => {
+  expect(
+    run(`
+      fn gimmeFive()
+        return 5
+      endfn
+      gimmeFive()
+    `)
+  ).toEqual(5);
+
+  expect(
+    run(`
+      fn add2(x, y)
+        return x + y
+      endfn
+      add2(6, 5)
+    `)
+  ).toEqual(11);
+
+  expect(
+    run(`
+      fn add4(x, y, z, w)
+        return x + y + z + w
+      endfn
+      add4(10, 11, 12, 13)
+    `)
+  ).toEqual(46);
+});
+
 test("tokens are case-insensitive", () => {
   expect(
     run(`

@@ -15,6 +15,18 @@
       head
     );
   }
+
+  function possiblyEmptyList(items) {
+    if (items == null) {
+      return []
+    } else {
+      let [head, rest] = items
+      return [
+        head,
+        ...rest.map(item => item[3]),
+      ]
+    }
+  }
 }
 
 start = Program
@@ -72,15 +84,23 @@ BlockStatement = body:StatementList
   }
 
 FunctionDeclaration
-  = FN SEP id:Identifier _ "(" _ param:Identifier _ ")" _ body:BlockStatement SEP ENDFN
+  = FN SEP id:Identifier _ "(" _ params:IdentifierList _ ")" _ body:BlockStatement SEP ENDFN
   {
     return {
       type: "FunctionDeclaration",
       id,
-      params: [ param ],
+      params,
       body,
     }
   }
+
+IdentifierList
+  = identifiers:(Identifier (_ "," _ Identifier)*)?
+    { return possiblyEmptyList(identifiers) }
+
+ExpressionList
+  = expressions:(Expression (_ "," _ Expression)*)?
+    { return possiblyEmptyList(expressions) }
 
 VariableDeclaration = id:Identifier _ "<-" _ init:Expression
   {
@@ -112,12 +132,12 @@ Value
   / Identifier
   / '(' _ expr:Expression _ ')' { return expr }
 
-FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
+FunctionCall = callee:Value _ "(" _ args:ExpressionList _ ")"
   {
     return {
       type: "CallExpression",
       callee,
-      arguments: [argument],
+      arguments: args,
     }
   }
 
@@ -130,12 +150,12 @@ FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
 Expression = ComparisonExpression / BinaryExpression / UnaryExpression
 
 FunctionExpression
-  = FN SEP id:Identifier? _ "(" _ param:Identifier _ ")" _ body:BlockStatement SEP ENDFN
+  = FN SEP id:Identifier? _ "(" _ params:IdentifierList _ ")" _ body:BlockStatement SEP ENDFN
     {
       return {
         type: "FunctionExpression",
         id,
-        params: [param],
+        params,
         body,
       }
     }
