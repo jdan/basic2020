@@ -20,7 +20,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.basic2020",
-					"match": "(?i)\\b(if|else|end|return)\\b"
+					"match": "(?i)\\b(if|else|endif|return)\\b"
 				},
 				{
 					"name": "keyword.operator.basic2020",
@@ -43,16 +43,27 @@
 		"storage": {
 			"patterns": [
 				{
-					"name": "storage.type.function.basic2020",
-					"match": "(?i)\\bfunction\\b"
+					"match": "(?i)\\b(fn)\\s+([A-Za-z][A-Za-z0-9\\$_]*)?",
+					"captures": {
+						"1": {
+							"name": "storage.type.function.basic2020"
+						},
+						"2": {
+							"name": "entity.name.function.basic2020"
+						}
+					}
+				},
+				{
+					"match": "(?i)\\bendfn\\b",
+					"name": "storage.type.function.basic2020"
 				},
 				{
 					"match": "\\b([A-Za-z][A-Za-z0-9\\$_]*)\\s*(<-)",
 					"captures": {
-						"0": {
+						"1": {
 							"name": "variable.basic2020"
 						},
-						"1": {
+						"2": {
 							"name": "keyword.operator.assignment.basic2020"
 						}
 					}
