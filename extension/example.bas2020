@@ -1,7 +1,13 @@
-fn triangle(n)
-  if n <= 0
-    return 0
-  else
-    return n + triangle(n-1)
-  endif
+fn fib(n)
+  fn helper(a, b, n)
+    if n = 0
+      return b
+    else
+      return helper(b, a+b, n-1)
+    endif
+  endfn
+
+  return helper(0, 1, n)
 endfn
+
+fib(100)
