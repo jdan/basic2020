@@ -31,21 +31,21 @@ test("evaluates strings", () => {
 test("evaluates assignments", () => {
   expect(
     run(`
-      X <- 5
-      X
+      x <- 5
+      x
     `)
   ).toEqual(5);
   expect(
     run(`
-      X <- 5
-      Y <- 3
-      X
+      x <- 5
+      y <- 3
+      x
     `)
   ).toEqual(5);
   expect(
     run(`
-      X <- 5 * 10
-      X
+      x <- 5 * 10
+      x
     `)
   ).toEqual(50);
 });
@@ -53,9 +53,9 @@ test("evaluates assignments", () => {
 test("supports reassignments", () => {
   expect(
     run(`
-      X <- 5
-      X <- 10
-      X
+      x <- 5
+      x <- 10
+      x
     `)
   ).toEqual(10);
 });
@@ -63,11 +63,11 @@ test("supports reassignments", () => {
 test("supports if statements", () => {
   expect(
     run(`
-      IF TRUE
+      if true
         10
-      ELSE
+      else
         20
-      END
+      endif
     `)
   ).toEqual(10);
 });
@@ -75,17 +75,17 @@ test("supports if statements", () => {
 test("supports ifs without elses", () => {
   expect(
     run(`
-      IF TRUE
+      if true
         10
-      END
+      endif
     `)
   ).toEqual(10);
 
   expect(
     run(`
-      IF FALSE
+      if false
         10
-      END
+      endif
     `)
   ).toEqual(undefined);
 });
@@ -93,11 +93,11 @@ test("supports ifs without elses", () => {
 test("supports functions", () => {
   expect(
     run(`
-      FUNCTION ADDTWO(N)
-        RETURN N + 2
-      END
+      fn add_two(n)
+        return n + 2
+      endfn
 
-      ADDTWO(20)
+      add_two(20)
     `)
   ).toEqual(22);
 });
@@ -105,13 +105,13 @@ test("supports functions", () => {
 test("supports higher order functions and function expressions", () => {
   expect(
     run(`
-      FUNCTION MAKEADDER(N)
-        RETURN (FUNCTION ADD(M)
-          RETURN N + M
-        END)
-      END
+      fn make_adder(n)
+        return (fn add(m)
+          return n + m
+        endfn)
+      endfn
 
-      add_five <- MAKEADDER(5)
+      add_five <- make_adder(5)
       add_five(20)
     `)
   ).toEqual(25);
@@ -120,15 +120,15 @@ test("supports higher order functions and function expressions", () => {
 test("supports recursive functions", () => {
   expect(
     run(`
-      FUNCTION FACTORIAL(N)
-        IF N = 1
-          RETURN 1
-        ELSE
-          RETURN N * FACTORIAL(N-1)
-        END
-      END
+      fn factorial(n)
+        if n = 1
+          return 1
+        else
+          return n * factorial(n-1)
+        endif
+      endfn
 
-      FACTORIAL(10)
+      factorial(10)
     `)
   ).toEqual(3628800);
 });
@@ -136,13 +136,13 @@ test("supports recursive functions", () => {
 test("tokens are case-insensitive", () => {
   expect(
     run(`
-      function factorial(n)
-        if n = 1
-          return 1
-        else
+      FN factorial(n)
+        IF n = 1
+          reTUrn 1
+        ELSE
           return n * factorial(n-1)
-        end
-      end
+        enDif
+      ENDFN
 
       factorial(10)
     `)

@@ -11,6 +11,4 @@ function run(code) {
   return eval(generated);
 }
 
-true;
-
 module.exports = run;

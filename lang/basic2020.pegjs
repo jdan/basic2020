@@ -30,10 +30,10 @@ Statement
     }
 
 IfStatement
-  = "if"i SEP test:Expression SEP
+  = IF SEP test:Expression SEP
       consequent:BlockStatement SEP
-      alternateBlock:("else"i SEP alternate:BlockStatement SEP)?
-      "end"i
+      alternateBlock:(ELSE SEP alternate:BlockStatement SEP)?
+    ENDIF
     {
       let alternate = alternateBlock ? alternateBlock[2] : null
       return {
@@ -53,7 +53,7 @@ BlockStatement = body:StatementList
   }
 
 FunctionDeclaration
-  = "function"i SEP id:Identifier _ "(" _ param:Identifier _ ")" _ body:BlockStatement SEP "end"i
+  = FN SEP id:Identifier _ "(" _ param:Identifier _ ")" _ body:BlockStatement SEP ENDFN
   {
     return {
       type: "FunctionDeclaration",
@@ -78,7 +78,7 @@ VariableDeclaration = id:Identifier _ "<-" _ init:Expression
     }
   }
 
-ReturnStatement = "return"i SEP argument:Expression
+ReturnStatement = RETURN SEP argument:Expression
   {
     return {
       type: "ReturnStatement",
@@ -95,7 +95,6 @@ Value
   / Identifier
   / '(' _ expr:Expression _ ')' { return expr }
 
-// hmmmmmm putting `_` at the end of this breaks everything
 FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
   {
     return {
@@ -106,7 +105,7 @@ FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
   }
 
 FunctionExpression
-  = "function"i SEP id:Identifier? _ "(" _ param:Identifier _ ")" _ body:BlockStatement SEP "end"i
+  = FN SEP id:Identifier? _ "(" _ param:Identifier _ ")" _ body:BlockStatement SEP ENDFN
     {
       return {
         type: "FunctionExpression",
@@ -118,6 +117,7 @@ FunctionExpression
 
 UnaryExpression = FunctionExpression / FunctionCall / Value
 
+// TODO: Parse > above +
 BinaryExpression = head:UnaryExpression rest:(_ Operator _ UnaryExpression)+
   {
     // Binary expressions are left-recursive
@@ -177,8 +177,14 @@ Boolean
   = "true"i { return { type: "Literal", raw: "true", value: true } }
   / "false"i { return { type: "Literal", raw: "false", value: false } }
 
-// TODO: Make tokens of these to use everywhere
-ReservedWord = "if"i / "else"i / "end"i / "function"i
+IF = "if"i
+ELSE = "else"i
+ENDIF = "endif"i
+FN = "fn"i
+ENDFN = "endfn"i
+RETURN = "return"i
+
+ReservedWord = IF / ELSE / ENDIF / FN / ENDFN / RETURN
 
 // Optional whitespace
 _ = [ \t\n\r]*
