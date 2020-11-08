@@ -106,9 +106,9 @@ test("supports higher order functions and function expressions", () => {
   expect(
     run(`
       fn make_adder(n)
-        return (fn add(m)
+        return fn add(m)
           return n + m
-        endfn)
+        endfn
       endfn
 
       add_five <- make_adder(5)
@@ -147,4 +147,19 @@ test("tokens are case-insensitive", () => {
       factorial(10)
     `)
   ).toEqual(3628800);
+});
+
+test("comparators are parsed above arithmetic operators", () => {
+  expect(
+    run(`
+      x <- 10 * 4 < 9 * 5
+      x
+    `)
+  ).toEqual(true);
+  expect(
+    run(`
+      x <- 9 * 5 < 10 * 4
+      x
+    `)
+  ).toEqual(false);
 });

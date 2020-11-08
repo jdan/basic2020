@@ -1,3 +1,22 @@
+{
+  function leftRecursive(head, rest) {
+    return rest.reduce(
+      (left, item) => {
+        let operator = item[1];
+        let right = item[3];
+
+        return {
+          type: "BinaryExpression",
+          left,
+          operator,
+          right,
+        };
+      },
+      head
+    );
+  }
+}
+
 start = Program
 
 Program = _ body:StatementList _
@@ -86,8 +105,6 @@ ReturnStatement = RETURN SEP argument:Expression
     }
   }
 
-Expression = BinaryExpression / UnaryExpression
-
 Value
   = Number
   / String
@@ -104,6 +121,14 @@ FunctionCall = callee:Value _ "(" _ argument:Expression _ ")"
     }
   }
 
+// The order of matches here determines infix operator precedence
+//    i.e. 1 + 3 > 4 + 5
+//         will evaluate left as `1+3` and right as `4+5` for an
+//         expression of `>`
+//
+// TODO: Binary operations
+Expression = ComparisonExpression / BinaryExpression / UnaryExpression
+
 FunctionExpression
   = FN SEP id:Identifier? _ "(" _ param:Identifier _ ")" _ body:BlockStatement SEP ENDFN
     {
@@ -117,26 +142,14 @@ FunctionExpression
 
 UnaryExpression = FunctionExpression / FunctionCall / Value
 
-// TODO: Parse > above +
-BinaryExpression = head:UnaryExpression rest:(_ Operator _ UnaryExpression)+
-  {
-    // Binary expressions are left-recursive
-    // i.e. 3-1-2 == (3-1)-2
-    return rest.reduce(
-      (left, item) => {
-        let operator = item[1];
-        let right = item[3];
+ComparisonExpression
+  = head:BinaryExpression rest:(_ ComparisonOperator _ BinaryExpression)+
+    { return leftRecursive(head, rest) }
 
-        return {
-          type: "BinaryExpression",
-          left,
-          operator,
-          right,
-        };
-      },
-      head
-    );
-  }
+BinaryExpression
+  = head:UnaryExpression rest:(_ BinaryOperator _ UnaryExpression)+
+    { return leftRecursive(head, rest) }
+  / UnaryExpression
 
 Number = digits:[0-9]+
   {
@@ -165,7 +178,10 @@ String
         raw: `'${value.join("")}'`,
       }
     }
-Operator = "+" / "-" / "*" / '/' / "!=" / "=" / "<=" / ">=" / "<" / ">"
+
+ComparisonOperator = "!=" / "=" / "<=" / ">=" / "<" / ">"
+BinaryOperator = "+" / "-" / "*" / '/'
+
 Identifier = !ReservedWord name:([A-Za-z][A-Za-z0-9\$_]*)
   {
     return {
