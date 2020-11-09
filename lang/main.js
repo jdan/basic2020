@@ -2,7 +2,7 @@ let fs = require("fs");
 let path = require("path");
 let pegjs = require("pegjs");
 let escodegen = require("escodegen");
-let transform = require("./transform");
+let { transform, PREAMBLE_FIELD } = require("./transform");
 
 function getGenerated(code) {
   let parser = pegjs.generate(
@@ -10,7 +10,8 @@ function getGenerated(code) {
   );
   let parsed = parser.parse(code);
   let transformed = transform(parsed);
-  return escodegen.generate(transformed);
+  let generated = escodegen.generate(transformed);
+  return `${transformed[PREAMBLE_FIELD]}\n\n${generated}`;
 }
 
 function run(code) {
@@ -34,7 +35,6 @@ if (require.main === module) {
       console.log("---- END GENERATED OUTPUT ----\n");
     }
 
-    // todo: don't log, require PRINT()
-    console.log(eval(generated));
+    eval(generated);
   });
 }

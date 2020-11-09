@@ -236,3 +236,7 @@ describe("Structs", () => {
 
   test.todo("cannot create new fields");
 });
+
+describe("Preamble", () => {
+  test.todo("Parses and renders a preamble");
+});

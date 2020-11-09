@@ -22,5 +22,4 @@ insert(t, 11)
 insert(t, 7)
 insert(t, 24)
 insert(t, 32)
-
-t
+PRINT(t)

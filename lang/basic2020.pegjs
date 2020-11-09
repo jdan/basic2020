@@ -31,12 +31,23 @@
 
 start = Program
 
-Program = _ body:StatementList _
+Program = _ preamble:(Preamble SEP)? body:StatementList _
   {
     return {
       type: "Program",
+      preamble: preamble && preamble.slice(0, -1),
       body,
     }
+  }
+
+Preamble = head:PreambleEntry rest:(_ PreambleEntry)*
+  {
+    return [head, ...rest.map(([_, entry]) => entry)]
+  }
+
+PreambleEntry = field:("name"i / "author"i / "mode"i / "date"i) SEP value:[^\n]+
+  {
+    return [field, value.join("")]
   }
 
 StatementList = head:Statement rest:(SEP Statement)*
