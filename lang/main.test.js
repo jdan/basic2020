@@ -227,7 +227,9 @@ describe("Structs", () => {
         struct Person (name, age)
 
         me <- Person(Name("Jordan", "Scales"), 28)
-        me.name.last
+        me
+          .name
+          .last
       `)
     ).toEqual("Scales");
   });

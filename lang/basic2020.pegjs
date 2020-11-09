@@ -116,14 +116,14 @@ StructFieldAssignment = left:MemberExpression _ "<-" _ right:Expression
     }
   }
 
-MemberExpression = head:Identifier rest:("." Identifier)+
+MemberExpression = head:Identifier rest:(_ "." Identifier)+
   {
     // TODO: Might want to make a custom type and transform
     // it to provide good error messages
     return rest.reduce((object, item) => ({
       type: "MemberExpression",
       object,
-      property: item[1],
+      property: item[2],
     }), head)
   }
 
