@@ -35,10 +35,36 @@ let transformNotEqualOperator = (node) =>
       }
     : node;
 
+let transformStructs = (node) =>
+  node && node.type === "StructDeclaration"
+    ? {
+        type: "FunctionDeclaration",
+        id: node.id,
+        params: node.params,
+        body: {
+          type: "BlockStatement",
+          body: [
+            {
+              type: "ReturnStatement",
+              argument: {
+                type: "ObjectExpression",
+                properties: node.params.map((param) => ({
+                  type: "Property",
+                  key: param,
+                  value: param,
+                })),
+              },
+            },
+          ],
+        },
+      }
+    : node;
+
 let transforms = [
   transformIfs,
   transformEqualOperator,
   transformNotEqualOperator,
+  transformStructs,
 ];
 
 let applyTransforms = (item) => transforms.reduce((acc, f) => f(acc), item);

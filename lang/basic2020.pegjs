@@ -50,7 +50,9 @@ StatementList = head:Statement rest:(SEP Statement)*
 Statement
   = IfStatement
   / FunctionDeclaration
-  / VariableDeclaration
+  / StructDeclaration
+  / StructFieldAssignment
+  / VariableAssignment
   / ReturnStatement
   / expression:Expression
     {
@@ -94,15 +96,38 @@ FunctionDeclaration
     }
   }
 
-IdentifierList
-  = identifiers:(Identifier (_ "," _ Identifier)*)?
-    { return possiblyEmptyList(identifiers) }
+StructDeclaration
+  = STRUCT SEP id:Identifier _ "(" _ params:IdentifierList _ ")"
+  {
+    return {
+      type: "StructDeclaration",
+      id,
+      params,
+    }
+  }
 
-ExpressionList
-  = expressions:(Expression (_ "," _ Expression)*)?
-    { return possiblyEmptyList(expressions) }
+StructFieldAssignment = left:MemberExpression _ "<-" _ right:Expression
+  {
+    return {
+      type: "AssignmentExpression",
+      left,
+      operator: "=",
+      right,
+    }
+  }
 
-VariableDeclaration = id:Identifier _ "<-" _ init:Expression
+MemberExpression = head:Identifier rest:("." Identifier)+
+  {
+    // TODO: Might want to make a custom type and transform
+    // it to provide good error messages
+    return rest.reduce((object, item) => ({
+      type: "MemberExpression",
+      object,
+      property: item[1],
+    }), head)
+  }
+
+VariableAssignment = id:Identifier _ "<-" _ init:Expression
   {
     return {
       type: "VariableDeclaration",
@@ -129,6 +154,7 @@ Value
   = Number
   / String
   / Boolean
+  / MemberExpression
   / Identifier
   / '(' _ expr:Expression _ ')' { return expr }
 
@@ -170,6 +196,14 @@ BinaryExpression
   = head:UnaryExpression rest:(_ BinaryOperator _ UnaryExpression)+
     { return leftRecursive(head, rest) }
   / UnaryExpression
+
+IdentifierList
+  = identifiers:(Identifier (_ "," _ Identifier)*)?
+    { return possiblyEmptyList(identifiers) }
+
+ExpressionList
+  = expressions:(Expression (_ "," _ Expression)*)?
+    { return possiblyEmptyList(expressions) }
 
 Number = digits:[0-9]+
   {
@@ -219,8 +253,9 @@ ENDIF = "endif"i
 FN = "fn"i
 ENDFN = "endfn"i
 RETURN = "return"i
+STRUCT = "struct"i
 
-ReservedWord = IF / ELSE / ENDIF / FN / ENDFN / RETURN
+ReservedWord = IF / ELSE / ENDIF / FN / ENDFN / RETURN / STRUCT
 
 // Optional whitespace
 _ = [ \t\n\r]*

@@ -192,3 +192,33 @@ test("comparators are parsed above arithmetic operators", () => {
     `)
   ).toEqual(false);
 });
+
+describe("Structs", () => {
+  test("can create new structs", () => {
+    expect(
+      run(`
+        STRUCT Person(name, age)
+
+        me <- Person("Jordan", 28)
+        me.name
+      `)
+    ).toEqual("Jordan");
+  });
+
+  test("can reassign fields", () => {
+    expect(
+      run(`
+        struct Person (
+          name,
+          age
+        )
+
+        me <- Person("Jordan", 28)
+        me.age <- 30
+        me.age
+      `)
+    ).toEqual(30);
+  });
+
+  test.todo("cannot create new fields");
+});
