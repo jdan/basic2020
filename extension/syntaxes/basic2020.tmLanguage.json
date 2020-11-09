@@ -72,6 +72,10 @@
 							"name": "keyword.operator.assignment.basic2020"
 						}
 					}
+				},
+				{
+					"match": "(?i)\\bstruct\\b",
+					"name": "storage.type.class.basic2020"
 				}
 			]
 		},

@@ -1,0 +1,26 @@
+STRUCT Tree (left, value, right)
+
+fn insert(node, value)
+  if node = null
+    return Tree(null, value, null)
+  else
+    if value >= node.value
+      node.right <- insert(node.right, value)
+    else
+      node.left <- insert(node.left, value)
+    endif
+  endif
+
+  return node
+endfn
+
+t <- Tree(null, 10, null)
+insert(t, 5)
+insert(t, 3)
+insert(t, 18)
+insert(t, 11)
+insert(t, 7)
+insert(t, 24)
+insert(t, 32)
+
+t
