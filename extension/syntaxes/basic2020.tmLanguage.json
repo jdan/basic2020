@@ -58,6 +58,11 @@
 					"name": "storage.type.function.basic2020"
 				},
 				{
+					"//": "function call i.e. the `f` in `f(x)`",
+					"match": "\\b([A-Za-z][A-Za-z0-9\\$_]*)\\s*(?=\\()",
+					"name": "entity.name.function.basic2020"
+				},
+				{
 					"match": "\\b([A-Za-z][A-Za-z0-9\\$_]*)\\s*(<-)",
 					"captures": {
 						"1": {
