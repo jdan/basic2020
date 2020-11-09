@@ -220,5 +220,17 @@ describe("Structs", () => {
     ).toEqual(30);
   });
 
+  test("fields can be nested and accessed", () => {
+    expect(
+      run(`
+        struct Name (first, last)
+        struct Person (name, age)
+
+        me <- Person(Name("Jordan", "Scales"), 28)
+        me.name.last
+      `)
+    ).toEqual("Scales");
+  });
+
   test.todo("cannot create new fields");
 });
