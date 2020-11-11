@@ -10,4 +10,4 @@ fn fib(n)
   return helper(0, 1, n)
 endfn
 
-fib(100)
+print(fib(100))

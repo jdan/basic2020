@@ -90,13 +90,7 @@ let buildPreambleComment = ({ name, author, date }) => {
 };
 
 let buildPreambleFunctions = ({ mode }) => {
-  if (mode === "cli") {
-    // What about lower case print?
-    return `function PRINT(...args) {
-  console.log(...args)
-}`;
-  }
-
+  // TODO
   return "";
 };
 
@@ -117,9 +111,31 @@ let transformPreamble = (node) => {
   };
 };
 
+let transformPrints = (node) =>
+  node &&
+  node.type === "CallExpression" &&
+  node.callee.type === "Identifier" &&
+  node.callee.name.toLowerCase() === "print"
+    ? {
+        ...node,
+        callee: {
+          type: "MemberExpression",
+          object: {
+            type: "Identifier",
+            name: "console",
+          },
+          property: {
+            type: "Identifier",
+            name: "log",
+          },
+        },
+      }
+    : node;
+
 let transforms = [
   transformPreamble,
   transformStructs,
+  transformPrints,
   transformEqualOperator,
   transformNotEqualOperator,
 ];
