@@ -209,11 +209,11 @@ BinaryExpression
   / UnaryExpression
 
 IdentifierList
-  = identifiers:(Identifier (_ "," _ Identifier)*)?
+  = identifiers:(Identifier (_ "," _ Identifier)* ","?)?
     { return possiblyEmptyList(identifiers) }
 
 ExpressionList
-  = expressions:(Expression (_ "," _ Expression)*)?
+  = expressions:(Expression (_ "," _ Expression)* ","?)?
     { return possiblyEmptyList(expressions) }
 
 Number = digits:[0-9]+

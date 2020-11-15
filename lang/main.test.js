@@ -153,6 +153,35 @@ test("supports functions with any number of arguments", () => {
   `).toEvaluateTo(46);
 });
 
+test("supports trailing commas in function definitions", () => {
+  expect(`
+    fn add4
+    (
+      x,
+      y,
+      z,
+      w,
+    )
+      return x + y + z + w
+    endfn
+    add4(10, 11, 12, 13)
+  `).toEvaluateTo(46);
+});
+
+test("supports trailing commas in function callls", () => {
+  expect(`
+    fn add4(x, y, z, w,)
+      return x + y + z + w
+    endfn
+    add4 (
+      10,
+      11,
+      12,
+      13,
+    )
+  `).toEvaluateTo(46);
+});
+
 test("tokens are case-insensitive", () => {
   expect(`
     FN factorial(n)
@@ -205,7 +234,7 @@ describe("Structs", () => {
   test("fields can be nested and accessed", () => {
     expect(`
       struct Name (first, last)
-      struct Person (name, age)
+      struct Person (name, age,)
 
       me <- Person(Name("Jordan", "Scales"), 28)
       me.name.first <- "nadroJ"
